@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel — Global Operations Center</title>
+    <style>
+        :root {
+            --bg-deep: #06070b;
+            --bg-surface: #0c0e15;
+            --bg-panel: rgba(14, 16, 24, 0.68);
+            --bg-panel-hover: rgba(18, 20, 30, 0.74);
+            --border-subtle: rgba(255, 255, 255, 0.07);
+            --border-accent: rgba(99, 155, 240, 0.18);
+            --border-active: rgba(99, 155, 240, 0.32);
+            --accent-primary: #639bf0;
+            --accent-primary-dim: #4a7cc4;
+            --accent-primary-soft: rgba(99, 155, 240, 0.2);
+            --accent-primary-glow: rgba(99, 155, 240, 0.4);
+            --accent-teal: #4ec9a0;
+            --accent-teal-dim: #3da884;
+            --accent-teal-soft: rgba(78, 201, 160, 0.18);
+            --status-ok: #4ec9a0;
+            --status-warn: #e8a850;
+            --status-critical: #e0556a;
+            --status-inactive: #555a68;
+            --text-primary: #e4e6ed;
+            --text-secondary: #9599a8;
+            --text-muted: #676b78;
+            --text-inverse: #0c0e15;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 12px;
+            --space-lg: 16px;
+            --space-xl: 20px;
+            --space-2xl: 28px;
+            --space-3xl: 36px;
+            --font-family: 'Inter', 'SF Pro Display', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+            --font-size-xs: 10px;
+            --font-size-sm: 11.5px;
+            --font-size-md: 13px;
+            --font-size-lg: 15px;
+            --font-size-xl: 18px;
+            --font-size-2xl: 24px;
+            --font-size-3xl: 32px;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --shadow-panel: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            --shadow-panel-raised: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+            --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: 150ms var(--ease-smooth);
+            --transition-slow: 400ms var(--ease-smooth);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 28% 15%, rgba(99, 155, 240, 0.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 72% 75%, rgba(78, 201, 160, 0.04) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 50%, rgba(99, 155, 240, 0.02) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: ambientShift 22s ease-in-out infinite;
+        }
+        @keyframes ambientShift {
+            0%,
+            100% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+            25% {
+                opacity: 1;
+                transform: scale(1.04);
+            }
+            50% {
+                opacity: 0.85;
+                transform: scale(0.97);
+            }
+            75% {
+                opacity: 1;
+                transform: scale(1.03);
+            }
+        }
+
+        .dashboard {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1840px;
+            height: 100vh;
+            max-height: 1080px;
+            display: flex;
+            flex-direction: column;
+            padding: var(--space-lg) var(--space-xl) var(--space-xl);
+            gap: var(--space-lg);
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 50px;
+            flex-shrink: 0;
+            padding: 0 var(--space-lg);
+            background: var(--bg-panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-panel);
+            transition: border-color var(--transition-slow);
+        }
+        .top-bar:hover {
+            border-color: var(--border-accent);
+        }
+        .top-bar__left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        .brand-mark {
+            width: 22px;
+            height: 22px;
+            border-radius: 5px;
+            background: var(--accent-primary);
+            position: relative;
+            flex-shrink: 0;
+            box-shadow: 0 0 12px var(--accent-primary-glow);
+            animation: brandPulse 4s ease-in-out infinite;
+        }
+        @keyframes brandPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 10px var(--accent-primary-glow);
+            }
+            50% {
+                box-shadow: 0 0 22px rgba(99, 155, 240, 0.6);
+            }
+        }
+        .brand-mark::after {
+            content: '';
+            position: absolute;
+            inset: 5px;
+            border-radius: 2px;
+            background: var(--bg-deep);
+        }
+        .top-bar__title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            letter-spacing: 0.04em;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+        .top-bar__subtitle {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-muted);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+        .top-bar__center {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+        .status-summary {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .status-dot--ok {
+            background: var(--status-ok);
+            box-shadow: 0 0 6px rgba(78, 201, 160, 0.6);
+        }
+        .status-dot--warn {
+            background: var(--status-warn);
+            box-shadow: 0 0 6px rgba(232, 168, 80, 0.6);
+        }
+        .top-bar__right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+        .top-bar__clock {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-semibold);
+            letter-spacing: 0.02em;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+            font-family: var(--font-mono);
+            line-height: 1;
+            min-width: 80px;
+            text-align: right;
+        }
+        .top-bar__date {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-secondary);
+            letter-spacing: 0.03em;
+            line-height: 1;
+            text-align: right;
+        }
+        .top-bar__divider {
+            width: 1px;
+            height: 22px;
+            background: var(--border-subtle);
+            flex-shrink: 0;
+        }
+
+        /* Main Grid — now 4x2, all cells filled */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr 1.3fr 1fr;
+            grid-template-rows: 1fr 1.2fr;
+            gap: var(--space-lg);
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* Panels — enhanced glassmorphism */
+        .panel {
+            background: var(--bg-panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-panel);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: border-color var(--transition-slow), box-shadow var(--transition-slow), background var(--transition-slow);
+            position: relative;
+        }
+        .panel:hover {
+            border-color: var(--border-accent);
+            box-shadow: var(--shadow-panel-raised);
+            background: var(--bg-panel-hover);
+        }
+        .panel::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .panel__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-lg) var(--space-xl);
+            flex-shrink: 0;
+            border-bottom: 1px solid var(--border-subtle);
+            gap: var(--space-md);
+            position: relative;
+            z-index: 1;
+        }
+        .panel__title {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            line-height: 1;
+        }
+        .panel__badge {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.04em;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .panel__badge--active {
+            background: var(--accent-teal-soft);
+            color: var(--accent-teal);
+        }
+        .panel__badge--live {
+            background: var(--accent-primary-soft);
+            color: var(--accent-primary);
+            animation: badgePulse 2.5s ease-in-out infinite;
+        }
+        @keyframes badgePulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .panel__body {
+            flex: 1;
+            padding: var(--space-lg) var(--space-xl);
+            overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 0;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.06) transparent;
+            position: relative;
+            z-index: 1;
+        }
+        .panel__body::-webkit-scrollbar {
+            width: 4px;
+        }
+        .panel__body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .panel__body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+        }
+
+        /* Status List */
+        .status-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            gap: var(--space-md);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.025);
+        }
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        .status-item__label {
+            font-size: var(--font-size-md);
+            color: var(--text-primary);
+            font-weight: var(--font-weight-medium);
+            flex: 1;
+        }
+        .status-item__value {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-secondary);
+            font-variant-numeric: tabular-nums;
+            font-family: var(--font-mono);
+        }
+        .status-item__indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .status-item__indicator--ok {
+            background: var(--status-ok);
+            box-shadow: 0 0 6px rgba(78, 201, 160, 0.5);
+        }
+        .status-item__indicator--warn {
+            background: var(--status-warn);
+            box-shadow: 0 0 6px rgba(232, 168, 80, 0.5);
+        }
+        .status-item__indicator--critical {
+            background: var(--status-critical);
+            box-shadow: 0 0 6px rgba(224, 85, 106, 0.5);
+            animation: criticalBlink 1.2s ease-in-out infinite;
+        }
+        @keyframes criticalBlink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);
+            height: 100%;
+            align-content: start;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: var(--space-md) var(--space-lg);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+            transition: border-color var(--transition-slow), background var(--transition-slow);
+        }
+        .stat-card:hover {
+            border-color: var(--border-accent);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .stat-card__value {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+            font-family: var(--font-mono);
+            line-height: 1;
+        }
+        .stat-card__value--accent {
+            color: var(--accent-primary);
+        }
+        .stat-card__value--teal {
+            color: var(--accent-teal);
+        }
+        .stat-card__label {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .stat-card__trend {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            letter-spacing: 0.03em;
+        }
+        .stat-card__trend--up {
+            color: var(--accent-teal);
+        }
+        .stat-card__trend--down {
+            color: var(--status-critical);
+        }
+
+        /* Globe Panel */
+        .globe-panel .panel__body {
+            padding: 0;
+            display: flex;
+            align-items: stretch;
+        }
+        .globe-container {
+            flex: 1;
+            position: relative;
+            min-height: 0;
+        }
+        .globe-container canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Forex Panel */
+        .forex-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        .forex-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.025);
+        }
+        .forex-row:last-child {
+            border-bottom: none;
+        }
+        .forex-pair {
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-sm);
+            letter-spacing: 0.03em;
+            color: var(--text-primary);
+            min-width: 65px;
+        }
+        .forex-price {
+            font-family: var(--font-mono);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-secondary);
+        }
+        .forex-change {
+            font-family: var(--font-mono);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            min-width: 55px;
+            text-align: right;
+        }
+        .forex-change--up {
+            color: var(--accent-teal);
+        }
+        .forex-change--down {
+            color: var(--status-critical);
+        }
+        .forex-spark {
+            width: 50px;
+            height: 22px;
+            margin-left: var(--space-sm);
+            opacity: 0.7;
+        }
+
+        /* World Clock */
+        .world-clock-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        .clock-city {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: var(--font-size-sm);
+        }
+        .clock-city__name {
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+            letter-spacing: 0.02em;
+        }
+        .clock-city__time {
+            font-family: var(--font-mono);
+            font-weight: var(--font-weight-semibold);
+            color: var(--accent-primary);
+            letter-spacing: 0.03em;
+        }
+
+        /* Crypto Ticker */
+        .crypto-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        .crypto-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: var(--font-size-sm);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.025);
+            padding-bottom: var(--space-xs);
+        }
+        .crypto-row:last-child {
+            border-bottom: none;
+        }
+        .crypto-name {
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            width: 60px;
+        }
+        .crypto-price {
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+        }
+        .crypto-change {
+            font-family: var(--font-mono);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            min-width: 55px;
+            text-align: right;
+        }
+
+        /* Timeline */
+        .timeline-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            position: relative;
+        }
+        .timeline-list::before {
+            content: '';
+            position: absolute;
+            left: 3px;
+            top: 10px;
+            bottom: 10px;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.06);
+            z-index: 0;
+        }
+        .timeline-entry {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-md);
+            padding: var(--space-sm) 0;
+            position: relative;
+        }
+        .timeline-entry__dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 5px;
+            position: relative;
+            z-index: 1;
+        }
+        .timeline-entry__dot--info {
+            background: var(--accent-primary);
+            box-shadow: 0 0 5px var(--accent-primary-glow);
+        }
+        .timeline-entry__dot--success {
+            background: var(--accent-teal);
+            box-shadow: 0 0 5px rgba(78, 201, 160, 0.5);
+        }
+        .timeline-entry__dot--warn {
+            background: var(--status-warn);
+            box-shadow: 0 0 5px rgba(232, 168, 80, 0.5);
+        }
+        .timeline-entry__content {
+            flex: 1;
+        }
+        .timeline-entry__time {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            letter-spacing: 0.03em;
+            margin-bottom: 2px;
+        }
+        .timeline-entry__desc {
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
+            line-height: 1.35;
+        }
+
+        /* Performance Chart */
+        .performance-panel .panel__body {
+            padding: var(--space-sm) var(--space-md);
+            display: flex;
+            align-items: stretch;
+        }
+        .chart-container {
+            flex: 1;
+            position: relative;
+            min-height: 0;
+        }
+        .chart-container canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .main-grid {
+                grid-template-columns: 1fr 1.25fr 1.25fr 1fr;
+                gap: var(--space-md);
+            }
+            .dashboard {
+                padding: var(--space-md);
+                gap: var(--space-md);
+            }
+        }
+        @media (max-width: 1100px) {
+            .main-grid {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto;
+                grid-auto-rows: auto;
+            }
+            .top-bar__center {
+                display: none;
+            }
+            .dashboard {
+                max-height: none;
+                height: auto;
+                min-height: 100vh;
+            }
+        }
+        @media (max-width: 700px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .top-bar {
+                flex-wrap: wrap;
+                height: auto;
+                padding: var(--space-md);
+                gap: var(--space-sm);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard" role="main" aria-label="Global Operations Dashboard">
+        <!-- Top Bar -->
+        <header class="top-bar" tabindex="0" aria-label="Top navigation bar">
+            <div class="top-bar__left">
+                <div class="brand-mark" aria-hidden="true"></div>
+                <div>
+                    <div class="top-bar__title">SENTINEL</div>
+                    <div class="top-bar__subtitle">Global Operations Center</div>
+                </div>
+            </div>
+            <div class="top-bar__center">
+                <div class="status-summary">
+                    <span class="status-dot status-dot--ok" aria-hidden="true"></span>
+                    <span>All Systems Operational</span>
+                </div>
+                <div class="status-summary">
+                    <span class="status-dot status-dot--warn" aria-hidden="true"></span>
+                    <span>1 Advisory</span>
+                </div>
+            </div>
+            <div class="top-bar__right">
+                <div class="top-bar__date" id="dateDisplay" aria-live="polite"></div>
+                <div class="top-bar__divider" aria-hidden="true"></div>
+                <div class="top-bar__clock" id="clockDisplay" aria-live="polite" aria-label="Current time"></div>
+            </div>
+        </header>
+
+        <!-- Main Grid — 8 panels, 4x2 -->
+        <div class="main-grid">
+            <!-- 1. System Status (col1 row1) -->
+            <section class="panel status-panel" tabindex="0" aria-label="System status panel">
+                <div class="panel__header">
+                    <span class="panel__title">System Status</span>
+                    <span class="panel__badge panel__badge--active">8 Services</span>
+                </div>
+                <div class="panel__body">
+                    <div class="status-list" id="statusList">
+                        <div class="status-item"><span class="status-item__indicator status-item__indicator--ok"></span><span class="status-item__label">API Gateway</span><span class="status-item__value">99.9%</span></div>
+                        <div class="status-item"><span class="status-item__indicator status-item__indicator--ok"></span><span class="status-item__label">Auth Service</span><span class="status-item__value">Active</span></div>
+                        <div class="status-item"><span class="status-item__indicator status-item__indicator--ok"></span><span class="status-item__label">Data Pipeline</span><span class="status-item__value">1.2M rec/s</span></div>
+                        <div class="status-item"><span class="status-item__indicator status-item__indicator--warn"></span><span class="status-item__label">Cache Layer</span><span class="status-item__value">Degraded</span></div>
+                        <div class="status-item"><span class="status-item__indicator status-item__indicator--ok"></span><span class="status-item__label">Message Queue</span><span class="status-item__value">Healthy</span></div>
+                        <div class="status-item"><span class="status-item__indicator status-item__indicator--ok"></span><span class="status-item__label">Storage Cluster</span><span class="status-item__value">87% cap.</span></div>
+                        <div class="status-item"><span class="status-item__indicator status-item__indicator--ok"></span><span class="status-item__label">Load Balancer</span><span class="status-item__value">Active</span></div>
+                        <div class="status-item"><span class="status-item__indicator status-item__indicator--critical"></span><span class="status-item__label">Log Aggregator</span><span class="status-item__value">Latency</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Performance Chart (col2 row1) -->
+            <section class="panel performance-panel" tabindex="0" aria-label="Performance chart panel">
+                <div class="panel__header">
+                    <span class="panel__title">Throughput — Requests per Second</span>
+                    <span class="panel__badge panel__badge--live">LIVE</span>
+                </div>
+                <div class="panel__body">
+                    <div class="chart-container" id="chartContainer">
+                        <canvas id="perfCanvas" aria-label="Real-time throughput chart" role="img"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Key Metrics (col3 row1) -->
+            <section class="panel stats-panel" tabindex="0" aria-label="Key metrics panel">
+                <div class="panel__header"><span class="panel__title">Key Metrics</span></div>
+                <div class="panel__body">
+                    <div class="stats-grid">
+                        <div class="stat-card"><span class="stat-card__value stat-card__value--accent" id="statConnections">18.4K</span><span class="stat-card__label">Connections</span><span class="stat-card__trend stat-card__trend--up">▲ 3.2%</span></div>
+                        <div class="stat-card"><span class="stat-card__value" id="statLatency">42ms</span><span class="stat-card__label">P95 Latency</span><span class="stat-card__trend stat-card__trend--down">▼ 5.1%</span></div>
+                        <div class="stat-card"><span class="stat-card__value stat-card__value--teal" id="statUptime">99.97%</span><span class="stat-card__label">Uptime 30d</span><span class="stat-card__trend stat-card__trend--up">▲ 0.02%</span></div>
+                        <div class="stat-card"><span class="stat-card__value" id="statErrorRate">0.12%</span><span class="stat-card__label">Error Rate</span><span class="stat-card__trend stat-card__trend--down">▼ 0.04%</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Globe Radar (col4 row1) -->
+            <section class="panel globe-panel" tabindex="0" aria-label="3D globe radar panel">
+                <div class="panel__header">
+                    <span class="panel__title">Global Radar</span>
+                    <span class="panel__badge panel__badge--live">LIVE</span>
+                </div>
+                <div class="panel__body">
+                    <div class="globe-container" id="globeContainer">
+                        <canvas id="globeCanvas" aria-label="Spinning 3D wireframe globe with radar sweep" role="img"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Activity Timeline (col1 row2) -->
+            <section class="panel timeline-panel" tabindex="0" aria-label="Activity timeline panel">
+                <div class="panel__header"><span class="panel__title">Activity Timeline</span></div>
+                <div class="panel__body">
+                    <div class="timeline-list" id="timelineList">
+                        <div class="timeline-entry"><span class="timeline-entry__dot timeline-entry__dot--success"></span><div class="timeline-entry__content"><div class="timeline-entry__time">14:31:52</div><div class="timeline-entry__desc">Deployment v4.2.1 completed successfully</div></div></div>
+                        <div class="timeline-entry"><span class="timeline-entry__dot timeline-entry__dot--info"></span><div class="timeline-entry__content"><div class="timeline-entry__time">14:28:17</div><div class="timeline-entry__desc">Scheduled backup initiated — Cluster B</div></div></div>
+                        <div class="timeline-entry"><span class="timeline-entry__dot timeline-entry__dot--warn"></span><div class="timeline-entry__content"><div class="timeline-entry__time">14:22:03</div><div class="timeline-entry__desc">Cache layer latency spike detected</div></div></div>
+                        <div class="timeline-entry"><span class="timeline-entry__dot timeline-entry__dot--info"></span><div class="timeline-entry__content"><div class="timeline-entry__time">14:15:40</div><div class="timeline-entry__desc">Certificate rotation completed — 12 domains</div></div></div>
+                        <div class="timeline-entry"><span class="timeline-entry__dot timeline-entry__dot--success"></span><div class="timeline-entry__content"><div class="timeline-entry__time">14:08:11</div><div class="timeline-entry__desc">Health check passed — All 48 nodes</div></div></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. Forex Monitor (col2 row2) -->
+            <section class="panel forex-panel" tabindex="0" aria-label="Forex trading monitor">
+                <div class="panel__header">
+                    <span class="panel__title">Forex Monitor</span>
+                    <span class="panel__badge panel__badge--live">LIVE</span>
+                </div>
+                <div class="panel__body">
+                    <div class="forex-list" id="forexList"></div>
+                </div>
+            </section>
+
+            <!-- 7. World Clock (col3 row2) -->
+            <section class="panel world-clock-panel" tabindex="0" aria-label="World clock panel">
+                <div class="panel__header">
+                    <span class="panel__title">World Clock</span>
+                </div>
+                <div class="panel__body">
+                    <div class="world-clock-list" id="worldClockList"></div>
+                </div>
+            </section>
+
+            <!-- 8. Live Crypto (col4 row2) -->
+            <section class="panel crypto-panel" tabindex="0" aria-label="Cryptocurrency ticker panel">
+                <div class="panel__header">
+                    <span class="panel__title">Crypto</span>
+                    <span class="panel__badge panel__badge--live">LIVE</span>
+                </div>
+                <div class="panel__body">
+                    <div class="crypto-list" id="cryptoList"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ── DOM Refs ──
+            const clockDisplay = document.getElementById('clockDisplay');
+            const dateDisplay = document.getElementById('dateDisplay');
+            const globeCanvas = document.getElementById('globeCanvas');
+            const perfCanvas = document.getElementById('perfCanvas');
+            const globeContainer = document.getElementById('globeContainer');
+            const chartContainer = document.getElementById('chartContainer');
+            const timelineList = document.getElementById('timelineList');
+            const forexList = document.getElementById('forexList');
+            const worldClockList = document.getElementById('worldClockList');
+            const cryptoList = document.getElementById('cryptoList');
+            const statConnections = document.getElementById('statConnections');
+            const statLatency = document.getElementById('statLatency');
+            const statUptime = document.getElementById('statUptime');
+            const statErrorRate = document.getElementById('statErrorRate');
+
+            // ── Clock ──
+            function updateClock() {
+                const now = new Date();
+                clockDisplay.textContent =
+                    String(now.getHours()).padStart(2, '0') + ':' +
+                    String(now.getMinutes()).padStart(2, '0') + ':' +
+                    String(now.getSeconds()).padStart(2, '0');
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+                    'October', 'November', 'December'
+                ];
+                dateDisplay.textContent =
+                    days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // ── Canvas Utility ──
+            function setupCanvas(canvas, container) {
+                const rect = container.getBoundingClientRect();
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                const w = rect.width;
+                const h = rect.height;
+                if (w <= 0 || h <= 0) return { width: 0, height: 0, ctx: null };
+                canvas.width = w * dpr;
+                canvas.height = h * dpr;
+                canvas.style.width = w + 'px';
+                canvas.style.height = h + 'px';
+                const ctx = canvas.getContext('2d');
+                ctx.scale(dpr, dpr);
+                return { width: w, height: h, ctx };
+            }
+
+            // ── Globe Radar ──
+            const globeState = { rotation: 0, radarAngle: 0 };
+            function drawGlobeRadar(ctx, width, height) {
+                const cx = width / 2,
+                    cy = height / 2;
+                const r = Math.min(width, height) * 0.38;
+                globeState.rotation += 0.0025;
+                globeState.radarAngle += 0.015;
+                if (globeState.radarAngle > Math.PI * 2) globeState.radarAngle -= Math.PI * 2;
+
+                ctx.clearRect(0, 0, width, height);
+                // latitude lines
+                for (let i = 1; i < 14; i++) {
+                    const lat = (i / 14) * Math.PI - Math.PI / 2;
+                    ctx.beginPath();
+                    const points = [];
+                    for (let j = 0; j <= 64; j++) {
+                        const lon = (j / 64) * Math.PI * 2;
+                        const px = r * Math.cos(lat) * Math.cos(lon);
+                        const py = r * Math.cos(lat) * Math.sin(lon);
+                        const pz = r * Math.sin(lat);
+                        const rot = globeState.rotation;
+                        const x2 = px * Math.cos(rot) - pz * Math.sin(rot);
+                        const z2 = px * Math.sin(rot) + pz * Math.cos(rot);
+                        points.push({ x: cx + x2, y: cy - py * 0.9, z: z2 });
+                    }
+                    for (let j = 0; j < points.length - 1; j++) {
+                        if (points[j].z > 0 || points[j + 1].z > 0) {
+                            ctx.beginPath();
+                            ctx.moveTo(points[j].x, points[j].y);
+                            ctx.lineTo(points[j + 1].x, points[j + 1].y);
+                            ctx.strokeStyle = 'rgba(99,155,240,0.3)';
+                            ctx.lineWidth = 0.6;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                // longitude lines
+                for (let j = 0; j < 18; j++) {
+                    const lon = (j / 18) * Math.PI * 2;
+                    ctx.beginPath();
+                    const lonPoints = [];
+                    for (let i = 0; i <= 40; i++) {
+                        const lat = (i / 40) * Math.PI - Math.PI / 2;
+                        const px = r * Math.cos(lat) * Math.cos(lon);
+                        const py = r * Math.cos(lat) * Math.sin(lon);
+                        const pz = r * Math.sin(lat);
+                        const rot = globeState.rotation;
+                        const x2 = px * Math.cos(rot) - pz * Math.sin(rot);
+                        const z2 = px * Math.sin(rot) + pz * Math.cos(rot);
+                        lonPoints.push({ x: cx + x2, y: cy - py * 0.9, z: z2 });
+                    }
+                    for (let i = 0; i < lonPoints.length - 1; i++) {
+                        if (lonPoints[i].z > 0 || lonPoints[i + 1].z > 0) {
+                            ctx.beginPath();
+                            ctx.moveTo(lonPoints[i].x, lonPoints[i].y);
+                            ctx.lineTo(lonPoints[i + 1].x, lonPoints[i + 1].y);
+                            ctx.strokeStyle = 'rgba(99,155,240,0.22)';
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                // radar sweep
+                const sweepStart = globeState.radarAngle;
+                const sweepEnd = sweepStart + 0.5;
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, r * 0.96, sweepStart, sweepEnd);
+                ctx.closePath();
+                const grad = ctx.createRadialGradient(cx, cy, r * 0.1, cx, cy, r);
+                grad.addColorStop(0, 'rgba(99,155,240,0.0)');
+                grad.addColorStop(0.7, 'rgba(99,155,240,0.07)');
+                grad.addColorStop(1, 'rgba(99,155,240,0.18)');
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.restore();
+                // outer ring
+                ctx.beginPath();
+                ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(99,155,240,0.28)';
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+            }
+
+            // ── Performance Chart ──
+            const perfState = { dataPoints: [], maxPoints: 220, lastAddTime: 0, addInterval: 480, currentValue: 6200 };
+            function initPerf() {
+                perfState.dataPoints = [];
+                let val = 5800 + Math.random() * 1200;
+                for (let i = 0; i < perfState.maxPoints; i++) {
+                    val += (Math.random() - 0.48) * 180;
+                    val = Math.max(1200, Math.min(14000, val));
+                    perfState.dataPoints.push(val);
+                }
+                perfState.currentValue = perfState.dataPoints[perfState.dataPoints.length - 1];
+            }
+            initPerf();
+            function updatePerf(time) {
+                const s = perfState;
+                if (time - s.lastAddTime > s.addInterval) {
+                    s.lastAddTime = time;
+                    const reversion = (6200 - s.currentValue) * 0.015;
+                    const noise = (Math.random() - 0.48) * 350;
+                    const spike = Math.random() < 0.04 ? (Math.random() - 0.5) * 1800 : 0;
+                    s.currentValue += reversion + noise + spike;
+                    s.currentValue = Math.max(800, Math.min(14500, s.currentValue));
+                    s.dataPoints.push(s.currentValue);
+                    if (s.dataPoints.length > s.maxPoints) s.dataPoints.shift();
+                }
+            }
+            function drawPerf(ctx, width, height) {
+                const dp = perfState.dataPoints;
+                if (dp.length < 2) return;
+                ctx.clearRect(0, 0, width, height);
+                const m = { top: 18, right: 20, bottom: 24, left: 48 };
+                const pw = width - m.left - m.right,
+                    ph = height - m.top - m.bottom;
+                const x = m.left,
+                    y = m.top;
+                ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i <= 5; i++) {
+                    const gy = y + (ph / 5) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(x, gy);
+                    ctx.lineTo(x + pw, gy);
+                    ctx.stroke();
+                    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+                    ctx.font = '9px "JetBrains Mono", monospace';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(Math.round((16000 - (16000 / 5) * i) / 1000) + 'k', x - 8, gy + 3);
+                }
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(x, y, pw, ph);
+                ctx.clip();
+                const grad = ctx.createLinearGradient(0, y, 0, y + ph);
+                grad.addColorStop(0, 'rgba(99,155,240,0.25)');
+                grad.addColorStop(0.5, 'rgba(99,155,240,0.06)');
+                grad.addColorStop(1, 'rgba(99,155,240,0.0)');
+                ctx.beginPath();
+                ctx.moveTo(x, y + ph);
+                for (let i = 0; i < dp.length; i++) {
+                    const px = x + (i / (dp.length - 1)) * pw;
+                    const py = y + ph - ((dp[i] - 0) / 16000) * ph;
+                    ctx.lineTo(px, py);
+                }
+                ctx.lineTo(x + pw, y + ph);
+                ctx.closePath();
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(x, y + ph - ((dp[0] - 0) / 16000) * ph);
+                for (let i = 1; i < dp.length; i++) {
+                    const px = x + (i / (dp.length - 1)) * pw;
+                    const py = y + ph - ((dp[i] - 0) / 16000) * ph;
+                    ctx.lineTo(px, py);
+                }
+                ctx.strokeStyle = 'rgba(99,155,240,0.9)';
+                ctx.lineWidth = 1.8;
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // ── Forex Data ──
+            const forexPairs = [
+                { pair: 'EUR/USD', base: 1.0850, pip: 0.0001 },
+                { pair: 'GBP/USD', base: 1.2640, pip: 0.0001 },
+                { pair: 'USD/JPY', base: 149.20, pip: 0.01 },
+                { pair: 'USD/CHF', base: 0.8830, pip: 0.0001 },
+                { pair: 'AUD/USD', base: 0.6520, pip: 0.0001 },
+                { pair: 'USD/CAD', base: 1.3580, pip: 0.0001 },
+                { pair: 'NZD/USD', base: 0.5940, pip: 0.0001 },
+            ];
+            const forexState = forexPairs.map(p => ({
+                ...p,
+                price: p.base,
+                change: 0,
+                history: Array.from({ length: 18 }, () => p.base + (Math.random() - 0.5) * p.pip * 40),
+            }));
+
+            function updateForex() {
+                forexState.forEach(item => {
+                    item.price += (Math.random() - 0.48) * item.pip * 12;
+                    item.history.push(item.price);
+                    if (item.history.length > 35) item.history.shift();
+                    item.change = ((item.price - item.base) / item.base) * 100;
+                });
+                renderForex();
+            }
+            function renderForex() {
+                forexList.innerHTML = '';
+                forexState.forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = 'forex-row';
+                    const cls = item.change >= 0 ? 'forex-change--up' : 'forex-change--down';
+                    const sign = item.change >= 0 ? '+' : '';
+                    row.innerHTML = `
+                        <span class="forex-pair">${item.pair}</span>
+                        <span class="forex-price">${item.price.toFixed(item.pip < 0.01 ? 4 : 2)}</span>
+                        <span class="forex-change ${cls}">${sign}${item.change.toFixed(2)}%</span>
+                        <canvas class="forex-spark" width="50" height="22"></canvas>
+                    `;
+                    forexList.appendChild(row);
+                    const spark = row.querySelector('.forex-spark');
+                    if (spark && item.history.length > 1) {
+                        const sctx = spark.getContext('2d');
+                        const sw = spark.width,
+                            sh = spark.height;
+                        sctx.clearRect(0, 0, sw, sh);
+                        const vals = item.history;
+                        const min = Math.min(...vals),
+                            max = Math.max(...vals),
+                            range = max - min || 1;
+                        sctx.beginPath();
+                        const step = sw / (vals.length - 1);
+                        vals.forEach((v, i) => {
+                            const sx = i * step;
+                            const sy = sh - ((v - min) / range) * (sh - 4) - 2;
+                            if (i === 0) sctx.moveTo(sx, sy);
+                            else sctx.lineTo(sx, sy);
+                        });
+                        sctx.strokeStyle = item.change >= 0 ? 'rgba(78,201,160,0.8)' : 'rgba(224,85,106,0.8)';
+                        sctx.lineWidth = 1.2;
+                        sctx.stroke();
+                    }
+                });
+            }
+
+            // ── World Clock ──
+            const timezones = [
+                { city: 'New York', tz: 'America/New_York' },
+                { city: 'London', tz: 'Europe/London' },
+                { city: 'Tokyo', tz: 'Asia/Tokyo' },
+                { city: 'Sydney', tz: 'Australia/Sydney' },
+            ];
+            function renderWorldClock() {
+                worldClockList.innerHTML = '';
+                timezones.forEach(t => {
+                    const now = new Date();
+                    const timeStr = now.toLocaleTimeString('en-US', { timeZone: t.tz, hour12: false, hour: '2-digit',
+                        minute: '2-digit', second: '2-digit' });
+                    const div = document.createElement('div');
+                    div.className = 'clock-city';
+                    div.innerHTML = `<span class="clock-city__name">${t.city}</span><span class="clock-city__time">${timeStr}</span>`;
+                    worldClockList.appendChild(div);
+                });
+            }
+            setInterval(renderWorldClock, 1000);
+            renderWorldClock();
+
+            // ── Crypto Ticker ──
+            const cryptoCoins = [
+                { name: 'BTC', price: 67200, change: 1.24 },
+                { name: 'ETH', price: 3480, change: -0.82 },
+                { name: 'SOL', price: 142.5, change: 2.15 },
+                { name: 'XRP', price: 0.623, change: 0.07 },
+            ];
+            function updateCrypto() {
+                cryptoCoins.forEach(c => {
+                    c.price += c.price * (Math.random() - 0.5) * 0.002;
+                    c.change += (Math.random() - 0.5) * 0.08;
+                    c.change = Math.min(5, Math.max(-5, c.change));
+                });
+                renderCrypto();
+            }
+            function renderCrypto() {
+                cryptoList.innerHTML = '';
+                cryptoCoins.forEach(c => {
+                    const cls = c.change >= 0 ? 'forex-change--up' : 'forex-change--down';
+                    const sign = c.change >= 0 ? '+' : '';
+                    const row = document.createElement('div');
+                    row.className = 'crypto-row';
+                    row.innerHTML = `
+                        <span class="crypto-name">${c.name}</span>
+                        <span class="crypto-price">${c.price.toLocaleString(undefined, {minimumFractionDigits: c.price > 100 ? 0 : 2, maximumFractionDigits: 2})}</span>
+                        <span class="crypto-change ${cls}">${sign}${c.change.toFixed(2)}%</span>
+                    `;
+                    cryptoList.appendChild(row);
+                });
+            }
+
+            // ── Timeline ──
+            const timelineEvents = [
+                { type: 'success', desc: 'Deployment v4.2.1 completed successfully' },
+                { type: 'info', desc: 'Scheduled backup initiated — Cluster B' },
+                { type: 'warn', desc: 'Cache layer latency spike detected' },
+                { type: 'info', desc: 'Certificate rotation completed — 12 domains' },
+                { type: 'success', desc: 'Health check passed — All 48 nodes' },
+                { type: 'info', desc: 'Auto-scaling triggered — Added 3 nodes' },
+                { type: 'warn', desc: 'Disk usage on /data exceeded 80%' },
+                { type: 'success', desc: 'Database vacuum completed — 14GB freed' },
+            ];
+            let eventIdx = 0;
+            function addTimelineEntry() {
+                const ev = timelineEvents[eventIdx % timelineEvents.length];
+                eventIdx++;
+                const now = new Date();
+                const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') +
+                    ':' + String(now.getSeconds()).padStart(2, '0');
+                const entry = document.createElement('div');
+                entry.className = 'timeline-entry';
+                entry.style.opacity = '0';
+                entry.style.transform = 'translateY(-8px)';
+                entry.innerHTML = `
+                    <span class="timeline-entry__dot timeline-entry__dot--${ev.type}"></span>
+                    <div class="timeline-entry__content">
+                        <div class="timeline-entry__time">${timeStr}</div>
+                        <div class="timeline-entry__desc">${ev.desc}</div>
+                    </div>
+                `;
+                timelineList.insertBefore(entry, timelineList.firstChild);
+                requestAnimationFrame(() => {
+                    entry.style.transition = 'opacity 0.4s ease-out, transform 0.4s ease-out';
+                    entry.style.opacity = '1';
+                    entry.style.transform = 'translateY(0)';
+                });
+                const entries = timelineList.querySelectorAll('.timeline-entry');
+                if (entries.length > 10) {
+                    const last = entries[entries.length - 1];
+                    last.style.transition = 'opacity 0.3s ease-out';
+                    last.style.opacity = '0';
+                    setTimeout(() => last.remove(), 350);
+                }
+            }
+
+            // ── Stats Jitter ──
+            function updateStats() {
+                statConnections.textContent = (18.4 + (Math.random() - 0.5) * 0.6).toFixed(1) + 'K';
+                statLatency.textContent = Math.round(40 + (Math.random() - 0.45) * 8) + 'ms';
+                statErrorRate.textContent = Math.max(0.04, 0.10 + (Math.random() - 0.48) * 0.06).toFixed(2) + '%';
+                statUptime.textContent = Math.min(99.99, Math.max(99.94, 99.965 + (Math.random() - 0.5) * 0.012)).toFixed(
+                    2) + '%';
+            }
+
+            // ── Animation Loop ──
+            let animId = null;
+            let lastResize = 0;
+            let globeDims = { width: 0, height: 0, ctx: null };
+            let perfDims = { width: 0, height: 0, ctx: null };
+
+            function resizeCanvases() {
+                const gRes = setupCanvas(globeCanvas, globeContainer);
+                const pRes = setupCanvas(perfCanvas, chartContainer);
+                globeDims = gRes;
+                perfDims = pRes;
+            }
+
+            function animate(timestamp) {
+                animId = requestAnimationFrame(animate);
+                if (timestamp - lastResize > 800) {
+                    lastResize = timestamp;
+                    const gRect = globeContainer.getBoundingClientRect();
+                    const pRect = chartContainer.getBoundingClientRect();
+                    if (Math.abs(gRect.width - globeDims.width) > 2 || Math.abs(gRect.height - globeDims.height) > 2 ||
+                        Math.abs(pRect.width - perfDims.width) > 2 || Math.abs(pRect.height - perfDims.height) > 2) {
+                        resizeCanvases();
+                    }
+                }
+                if (globeDims.ctx && globeDims.width > 0) drawGlobeRadar(globeDims.ctx, globeDims.width, globeDims.height);
+                if (perfDims.ctx && perfDims.width > 0) {
+                    updatePerf(timestamp);
+                    drawPerf(perfDims.ctx, perfDims.width, perfDims.height);
+                }
+            }
+
+            // ── Init ──
+            function init() {
+                resizeCanvases();
+                if (!animId) animId = requestAnimationFrame(animate);
+                renderForex();
+                setInterval(updateForex, 1800);
+                setInterval(() => { if (Math.random() < 0.5) addTimelineEntry(); }, 7500);
+                setInterval(updateStats, 4000);
+                setInterval(updateCrypto, 3000);
+                renderCrypto();
+                setTimeout(addTimelineEntry, 3000);
+                setTimeout(addTimelineEntry, 7000);
+            }
+
+            window.addEventListener('resize', () => {
+                clearTimeout(window._resizeTimer);
+                window._resizeTimer = setTimeout(resizeCanvases, 250);
+            });
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    if (animId) { cancelAnimationFrame(animId);
+                        animId = null; }
+                } else {
+                    if (!animId) { resizeCanvases();
+                        animId = requestAnimationFrame(animate); }
+                }
+            });
+
+            init();
+            console.log('Sentinel Global Operations Center — v2.0 Initialized');
+        })();
+    </script>
+</body>
+</html>

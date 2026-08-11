@@ -1,0 +1,7 @@
+opencv-python>=4.8.0
+mediapipe>=0.10.0
+cvzone>=2.0.0
+pyautogui>=0.9.54
+screeninfo>=0.8.1
+pywin32>=306
+PyGetWindow>=0.0.9
