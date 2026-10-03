@@ -158,3 +158,7 @@ Fork it, customize the gestures, and build your own futuristic PC controller.
 ---
 
 **Built with Python + Computer Vision + a little futuristic madness. ⚡**
+
+## Project Notes
+
+Gesture recognition is processed locally through the webcam pipeline. The dashboard is separated from the recognition workflow so the interface can be refined independently.
