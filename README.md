@@ -1,35 +1,35 @@
-# ✋ Neon Gesture Controller
+#  Neon Gesture Controller
 
 A futuristic Windows hand-gesture controller built with Python, OpenCV, CVZone, and MediaPipe.
 
 Use webcam-based hand gestures to trigger PC actions and launch selected applications or websites, with a separate neon HUD for visual feedback.
 
-## ✨ Features
+##  Features
 
-- ✋ Real-time hand tracking
-- 🧠 Gesture recognition
-- 🚀 Gesture-based action launching
-- 🌐 Website shortcuts
-- 🖥️ Windows application actions
-- 🎨 Neon HUD dashboard
-- 💎 Glassmorphism-inspired interface
-- ⏱️ Gesture cooldown handling
-- 📷 Webcam input
-- ⚡ Local computer-vision processing
+-  Real-time hand tracking
+-  Gesture recognition
+-  Gesture-based action launching
+-  Website shortcuts
+-  Windows application actions
+-  Neon HUD dashboard
+-  Glassmorphism-inspired interface
+- ⏱ Gesture cooldown handling
+-  Webcam input
+-  Local computer-vision processing
 
-## 🎮 Current Gesture Map
+##  Current Gesture Map
 
 | Gesture | Action |
 | --- | --- |
-| ✌️ Peace | YouTube |
-| ☝️ Pointer | ChatGPT |
-| 🤘 Rock | Instagram |
-| 🖐️ Three Fingers | WhatsApp Web |
-| 🤙 Pinky | Windows Task Manager |
+|  Peace | YouTube |
+|  Pointer | ChatGPT |
+|  Rock | Instagram |
+|  Three Fingers | WhatsApp Web |
+|  Pinky | Windows Task Manager |
 
 Gesture mappings can be changed in the controller implementation.
 
-## 🧠 Architecture
+##  Architecture
 
 ```text
 Webcam
@@ -47,7 +47,7 @@ Windows / Web Action
 
 The recognition pipeline runs locally. The dashboard is kept separate so the visual interface can evolve without replacing the core recognition workflow.
 
-## 🛠️ Stack
+##  Stack
 
 - Python 3.10+
 - OpenCV
@@ -57,7 +57,7 @@ The recognition pipeline runs locally. The dashboard is kept separate so the vis
 - CSS
 - JavaScript
 
-## 🚀 Getting Started
+##  Getting Started
 
 Install the Python dependencies listed by the project:
 
@@ -73,13 +73,13 @@ python main.py
 
 A working webcam is required for gesture recognition.
 
-## 🔒 Privacy
+##  Privacy
 
 Gesture recognition is processed locally on the computer. The project does not intentionally upload webcam footage to a remote server.
 
 Websites launched by gestures may of course communicate with their own services.
 
-## 🔧 Customization
+##  Customization
 
 You can extend the project by changing:
 
@@ -89,7 +89,7 @@ You can extend the project by changing:
 - Supported Windows actions
 - Additional gesture profiles
 
-## 🚧 Future Ideas
+##  Future Ideas
 
 - Custom gesture profiles
 - Multi-monitor support
