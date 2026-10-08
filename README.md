@@ -1,27 +1,24 @@
-# Neon Gesture Controller
+# GUESTURE-ASSISTANT
 
-A Windows hand-gesture controller that uses a webcam, computer vision, and gesture mappings to trigger selected PC actions and web shortcuts.
+A Windows hand-gesture controller that uses a webcam and computer vision to trigger configured desktop and web actions.
 
 ## Overview
 
-GUESTURE-ASSISTANT combines real-time hand tracking with a separate neon-style HUD. The webcam provides the input, OpenCV and the CVZone/MediaPipe stack process the hand data, and the recognized gesture is translated into a configured action.
-
-The project is designed as a local computer-vision experiment with a visual interface that can evolve independently from the recognition pipeline.
+GUESTURE-ASSISTANT uses Python, OpenCV, and MediaPipe-based hand tracking to recognize gestures from a webcam feed. Recognized gestures are mapped to predefined actions, while a separate browser-based dashboard provides the visual interface.
 
 ## Features
 
-- Real-time hand tracking
+- Real-time webcam input
+- Hand landmark tracking
 - Gesture recognition
-- Gesture-based action launching
-- Website shortcuts
+- Configurable gesture-to-action mappings
 - Windows application actions
-- Neon HUD dashboard
-- Glassmorphism-inspired interface
-- Gesture cooldown handling
-- Webcam input
+- Website shortcuts
 - Local computer-vision processing
+- Neon-style dashboard
+- Gesture cooldown handling
 
-## Current Gesture Map
+## Current Gesture Mapping
 
 | Gesture | Action |
 | --- | --- |
@@ -31,7 +28,7 @@ The project is designed as a local computer-vision experiment with a visual inte
 | Three Fingers | WhatsApp Web |
 | Pinky | Windows Task Manager |
 
-The gesture-to-action mappings can be changed in the controller implementation.
+The mappings can be changed in the controller implementation.
 
 ## Architecture
 
@@ -39,10 +36,7 @@ The gesture-to-action mappings can be changed in the controller implementation.
 Webcam
   |
   v
-OpenCV
-  |
-  v
-CVZone / MediaPipe
+OpenCV / MediaPipe
   |
   v
 Hand and Gesture Recognition
@@ -50,13 +44,13 @@ Hand and Gesture Recognition
   v
 Action Mapping
   |
-  v
-Windows / Web Action
+  +--> Windows Actions
+  +--> Web Shortcuts
 ```
 
-The recognition pipeline runs locally. The dashboard is kept separate from the core recognition flow so the visual layer can be refined without replacing the computer-vision logic.
+The recognition process runs locally. The dashboard is kept separate from the core controller so the interface can be changed independently.
 
-## Technology Stack
+## Technology
 
 - Python 3.10+
 - OpenCV
@@ -66,7 +60,7 @@ The recognition pipeline runs locally. The dashboard is kept separate from the c
 - CSS
 - JavaScript
 
-## Getting Started
+## Setup
 
 Install the Python dependencies:
 
@@ -74,43 +68,18 @@ Install the Python dependencies:
 pip install -r requirements.txt
 ```
 
-Start the controller:
+Then start the controller:
 
 ```bash
 python main.py
 ```
 
-A working webcam is required for gesture recognition.
+A working webcam is required.
 
 ## Privacy
 
-Gesture recognition is processed locally on the computer. The project does not intentionally upload webcam footage to a remote server.
-
-Websites or online services launched by gestures may communicate with their own services as normal.
-
-## Customization
-
-The controller can be extended by changing:
-
-- Gesture-to-action mappings
-- Cooldown timing
-- Dashboard visuals
-- Supported Windows actions
-- Additional gesture profiles
-
-## Future Ideas
-
-- Custom gesture profiles
-- Multi-monitor support
-- System resource HUD
-- Game controls
-- Android companion
-- Local AI integration
-- PC to Android communication
+The project processes gesture input locally and does not intentionally upload webcam footage to a remote server. Any website opened through a gesture communicates with that website according to its own service.
 
 ## Creator
 
 Made by **JebinTech**.
-
----
-Built with computer vision and a focused futuristic interface by **JebinTech**.
