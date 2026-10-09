@@ -90,7 +90,7 @@ def open_task_manager():
 def classify_hand_gesture(fingers):
     """
     Classifies 5 distinct app launcher gestures:
-    1. PEACE (✌️): Index & Middle extended -> Open YouTube
+    1. PEACE (Peace): Index & Middle extended -> Open YouTube
     2. POINTER (☝️): Index extended ONLY -> Open ChatGPT
     3. ROCK (🤘): Index & Pinky extended -> Open Instagram
     4. THREE_FINGERS (3️⃣): Index, Middle & Ring extended -> Open WHATSAPP
@@ -101,7 +101,7 @@ def classify_hand_gesture(fingers):
 
     thumb, index, middle, ring, pinky = fingers
 
-    # 1. Peace Sign (✌️): Index=1, Middle=1, Ring=0, Pinky=0
+    # 1. Peace Sign (Peace): Index=1, Middle=1, Ring=0, Pinky=0
     if index == 1 and middle == 1 and ring == 0 and pinky == 0:
         return "PEACE"
 
@@ -131,7 +131,7 @@ def main():
     print("      WEBCAM HAND TRACKING GESTURE APP LAUNCHER      ")
     print("=" * 65)
     print("Gestures:")
-    print(" 1. Peace Sign (✌️)               -> Open YouTube")
+    print(" 1. Peace Sign (Peace)               -> Open YouTube")
     print(" 2. Pointer Finger Only (☝️)       -> Open ChatGPT")
     print(" 3. Pointer & Pinky (🤘)           -> Open Instagram")
     print(" 4. Pointer, Middle & Ring (3️⃣)    -> Open WHATSAPP")
@@ -228,7 +228,7 @@ def main():
                 res = ""
                 if current_gesture == "PEACE":
                     res = open_url_in_chrome("https://www.youtube.com")
-                    action_banner = "PEACE SIGN: OPENING YOUTUBE ✌️"
+                    action_banner = "PEACE SIGN: OPENING YOUTUBE Peace"
                     action_banner_color = (255, 215, 0)  # Gold
 
                 elif current_gesture == "POINTER":
@@ -267,7 +267,7 @@ def main():
         # App Title
         cv2.putText(frame, "HAND TRACKING GESTURE APP LAUNCHER", (15, 25),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-        cv2.putText(frame, "✌️ YouTube | ☝️ ChatGPT | 🤘 Instagram | 3️⃣ Antigravity | 🤙 Task Manager", (15, 48),
+        cv2.putText(frame, "Peace YouTube | ☝️ ChatGPT | 🤘 Instagram | 3️⃣ Antigravity | 🤙 Task Manager", (15, 48),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.4, (180, 180, 180), 1)
 
         # Current Gesture Display Panel (Top Left Overlay)
