@@ -91,7 +91,7 @@ def classify_hand_gesture(fingers):
     """
     Classifies 5 distinct app launcher gestures:
     1. PEACE (Peace): Index & Middle extended -> Open YouTube
-    2. POINTER (☝️): Index extended ONLY -> Open ChatGPT
+    2. POINTER (Pointer): Index extended ONLY -> Open ChatGPT
     3. ROCK (🤘): Index & Pinky extended -> Open Instagram
     4. THREE_FINGERS (3️⃣): Index, Middle & Ring extended -> Open WHATSAPP
     5. PINKY_ONLY (🤙): Pinky extended ONLY -> Open Task Manager
@@ -105,7 +105,7 @@ def classify_hand_gesture(fingers):
     if index == 1 and middle == 1 and ring == 0 and pinky == 0:
         return "PEACE"
 
-    # 2. Pointer Finger Only (☝️): Index=1, Middle=0, Ring=0, Pinky=0
+    # 2. Pointer Finger Only (Pointer): Index=1, Middle=0, Ring=0, Pinky=0
     if index == 1 and middle == 0 and ring == 0 and pinky == 0:
         return "POINTER"
 
@@ -132,7 +132,7 @@ def main():
     print("=" * 65)
     print("Gestures:")
     print(" 1. Peace Sign (Peace)               -> Open YouTube")
-    print(" 2. Pointer Finger Only (☝️)       -> Open ChatGPT")
+    print(" 2. Pointer Finger Only (Pointer)       -> Open ChatGPT")
     print(" 3. Pointer & Pinky (🤘)           -> Open Instagram")
     print(" 4. Pointer, Middle & Ring (3️⃣)    -> Open WHATSAPP")
     print(" 5. Pinky Only (🤙)               -> Open Windows Task Manager")
@@ -233,7 +233,7 @@ def main():
 
                 elif current_gesture == "POINTER":
                     res = open_url_in_chrome("https://chatgpt.com")
-                    action_banner = "POINTER FINGER: OPENING CHATGPT ☝️"
+                    action_banner = "POINTER FINGER: OPENING CHATGPT Pointer"
                     action_banner_color = (0, 255, 255)  # Cyan
 
                 elif current_gesture == "ROCK":
@@ -267,7 +267,7 @@ def main():
         # App Title
         cv2.putText(frame, "HAND TRACKING GESTURE APP LAUNCHER", (15, 25),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-        cv2.putText(frame, "Peace YouTube | ☝️ ChatGPT | 🤘 Instagram | 3️⃣ Antigravity | 🤙 Task Manager", (15, 48),
+        cv2.putText(frame, "Peace YouTube | Pointer ChatGPT | 🤘 Instagram | 3️⃣ Antigravity | 🤙 Task Manager", (15, 48),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.4, (180, 180, 180), 1)
 
         # Current Gesture Display Panel (Top Left Overlay)
