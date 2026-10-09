@@ -93,7 +93,7 @@ def classify_hand_gesture(fingers):
     1. PEACE (Peace): Index & Middle extended -> Open YouTube
     2. POINTER (Pointer): Index extended ONLY -> Open ChatGPT
     3. ROCK (Rock): Index & Pinky extended -> Open Instagram
-    4. THREE_FINGERS (3️⃣): Index, Middle & Ring extended -> Open WHATSAPP
+    4. THREE_FINGERS (Three): Index, Middle & Ring extended -> Open WHATSAPP
     5. PINKY_ONLY (🤙): Pinky extended ONLY -> Open Task Manager
     """
     if len(fingers) < 5:
@@ -113,7 +113,7 @@ def classify_hand_gesture(fingers):
     if index == 1 and pinky == 1 and middle == 0 and ring == 0:
         return "ROCK"
 
-    # 4. Pointer, Middle & Ring (3️⃣): Index=1, Middle=1, Ring=1, Pinky=0
+    # 4. Pointer, Middle & Ring (Three): Index=1, Middle=1, Ring=1, Pinky=0
     if index == 1 and middle == 1 and ring == 1 and pinky == 0:
         return "THREE_FINGERS"
 
@@ -134,7 +134,7 @@ def main():
     print(" 1. Peace Sign (Peace)               -> Open YouTube")
     print(" 2. Pointer Finger Only (Pointer)       -> Open ChatGPT")
     print(" 3. Pointer & Pinky (Rock)           -> Open Instagram")
-    print(" 4. Pointer, Middle & Ring (3️⃣)    -> Open WHATSAPP")
+    print(" 4. Pointer, Middle & Ring (Three)    -> Open WHATSAPP")
     print(" 5. Pinky Only (🤙)               -> Open Windows Task Manager")
     print(" NOTE: Cursor does NOT move at all!")
     print("=" * 65)
@@ -243,7 +243,7 @@ def main():
 
                 elif current_gesture == "THREE_FINGERS":
                     res = open_url_in_chrome("https://web.whatsapp.com")
-                    action_banner = "3 FINGERS: OPENING WHATSAPPWEB 3️⃣"
+                    action_banner = "3 FINGERS: OPENING WHATSAPPWEB Three"
                     action_banner_color = (138, 43, 226)  # Blue-Violet
 
                 elif current_gesture == "PINKY_ONLY":
@@ -267,7 +267,7 @@ def main():
         # App Title
         cv2.putText(frame, "HAND TRACKING GESTURE APP LAUNCHER", (15, 25),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-        cv2.putText(frame, "Peace YouTube | Pointer ChatGPT | Rock Instagram | 3️⃣ Antigravity | 🤙 Task Manager", (15, 48),
+        cv2.putText(frame, "Peace YouTube | Pointer ChatGPT | Rock Instagram | Three Antigravity | 🤙 Task Manager", (15, 48),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.4, (180, 180, 180), 1)
 
         # Current Gesture Display Panel (Top Left Overlay)
