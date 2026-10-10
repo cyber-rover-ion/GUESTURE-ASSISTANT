@@ -1,34 +1,32 @@
 # GUESTURE-ASSISTANT
 
-A Windows hand-gesture controller that uses a webcam and computer vision to trigger configured desktop and web actions.
+A webcam-based hand-gesture controller for triggering configured desktop actions and website shortcuts on Windows.
 
 ## Overview
 
-GUESTURE-ASSISTANT uses Python, OpenCV, and MediaPipe-based hand tracking to recognize gestures from a webcam feed. Recognized gestures are mapped to predefined actions, while a separate browser-based dashboard provides the visual interface.
+GUESTURE-ASSISTANT uses Python and computer-vision libraries to detect hand landmarks and map recognized gestures to predefined actions. A separate browser-based dashboard provides a visual interface for the project.
 
 ## Features
 
-- Real-time webcam input
-- Hand landmark tracking
-- Gesture recognition
-- Configurable gesture-to-action mappings
-- Windows application actions
-- Website shortcuts
+- Live webcam input
+- Hand landmark tracking and gesture recognition
+- Gesture-to-action mappings
+- Windows application actions and website shortcuts
 - Local computer-vision processing
-- Neon-style dashboard
+- Browser-based dashboard
 - Gesture cooldown handling
 
-## Current Gesture Mapping
+## Default Gesture Mapping
 
 | Gesture | Action |
 | --- | --- |
 | Peace | YouTube |
 | Pointer | ChatGPT |
 | Rock | Instagram |
-| Three Fingers | WhatsApp Web |
+| Three fingers | WhatsApp Web |
 | Pinky | Windows Task Manager |
 
-The mappings can be changed in the controller implementation.
+Mappings depend on the current controller implementation and can be adjusted in the source code.
 
 ## Architecture
 
@@ -39,47 +37,42 @@ Webcam
 OpenCV / MediaPipe
   |
   v
-Hand and Gesture Recognition
+Hand Landmark and Gesture Recognition
   |
   v
-Action Mapping
-  |
-  +--> Windows Actions
-  +--> Web Shortcuts
+Configured Action Mapping
+  +--> Desktop Actions
+  +--> Website Shortcuts
 ```
-
-The recognition process runs locally. The dashboard is kept separate from the core controller so the interface can be changed independently.
 
 ## Technology
 
-- Python 3.10+
+- Python
 - OpenCV
-- CVZone
 - MediaPipe
-- HTML
-- CSS
-- JavaScript
+- CVZone
+- HTML, CSS, and JavaScript
 
-## Setup
+## Installation
 
-Install the Python dependencies:
+Install the dependencies listed in the repository:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Then start the controller:
+Start the controller:
 
 ```bash
 python main.py
 ```
 
-A working webcam is required.
+A working webcam is required. Review the configured actions before running the controller.
 
 ## Privacy
 
-The project processes gesture input locally and does not intentionally upload webcam footage to a remote server. Any website opened through a gesture communicates with that website according to its own service.
+Gesture recognition is designed to process webcam input locally. Websites opened by shortcuts operate under their own privacy policies and terms.
 
-## Creator
+## Maintainer
 
-Made by **JebinTech**.
+**JebinTech**
