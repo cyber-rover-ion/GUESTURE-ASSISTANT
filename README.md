@@ -1,77 +1,77 @@
 # GUESTURE-ASSISTANT
 
-A webcam-based hand-gesture controller for triggering configured desktop actions and website shortcuts on Windows.
+A Windows desktop utility that uses webcam-based hand tracking to launch configured websites and desktop tools through predefined gestures.
 
 ## Overview
 
-GUESTURE-ASSISTANT uses Python and computer-vision libraries to detect hand landmarks and map recognized gestures to predefined actions. A separate browser-based dashboard provides a visual interface for the project.
+GUESTURE-ASSISTANT uses OpenCV and CVZone/MediaPipe to detect a hand, classify a small set of gestures, and trigger the matching action. A camera preview displays the detected gesture and action status.
 
 ## Features
 
-- Live webcam input
-- Hand landmark tracking and gesture recognition
-- Gesture-to-action mappings
-- Windows application actions and website shortcuts
-- Local computer-vision processing
-- Browser-based dashboard
-- Gesture cooldown handling
+- Live webcam hand tracking
+- Gesture smoothing to reduce accidental triggers
+- Per-gesture cooldowns to prevent repeated launches
+- Configurable website and desktop-action mappings in `main.py`
+- Optional audio prompts from the local `sounds/` directory
+- Optional local dashboard in `dashboard.html`
+- Keyboard exit with `Q` or `Esc`
 
-## Default Gesture Mapping
+## Gesture Mapping
 
-| Gesture | Action |
+| Gesture | Default action |
 | --- | --- |
-| Peace | YouTube |
-| Pointer | ChatGPT |
-| Rock | Instagram |
-| Three fingers | WhatsApp Web |
-| Pinky | Windows Task Manager |
+| Peace | Open YouTube |
+| Index finger | Open ChatGPT |
+| Index and pinky | Open Instagram |
+| Three fingers | Open WhatsApp Web |
+| Pinky only | Open Windows Task Manager |
 
-Mappings depend on the current controller implementation and can be adjusted in the source code.
+Review the action mapping in the source before running the controller. Website shortcuts open external services in your browser.
 
-## Architecture
+## Requirements
 
-```text
-Webcam
-  |
-  v
-OpenCV / MediaPipe
-  |
-  v
-Hand Landmark and Gesture Recognition
-  |
-  v
-Configured Action Mapping
-  +--> Desktop Actions
-  +--> Website Shortcuts
-```
-
-## Technology
-
-- Python
-- OpenCV
-- MediaPipe
-- CVZone
-- HTML, CSS, and JavaScript
+- Windows
+- Python compatible with the installed MediaPipe and OpenCV versions
+- A working webcam
+- Optional: Google Chrome, local sound files, and `dashboard.html`
 
 ## Installation
 
-Install the dependencies listed in the repository:
+Open PowerShell in the repository directory and create a virtual environment:
 
-```bash
-pip install -r requirements.txt
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
 
-Start the controller:
+Run the controller:
 
-```bash
+```powershell
 python main.py
 ```
 
-A working webcam is required. Review the configured actions before running the controller.
+The webcam window displays the detected gesture and current action. Press `Q` or `Esc` to stop the application.
 
-## Privacy
+## Project Files
 
-Gesture recognition is designed to process webcam input locally. Websites opened by shortcuts operate under their own privacy policies and terms.
+- `main.py` — webcam loop, gesture classification, and action handlers
+- `dashboard.html` — optional local dashboard
+- `sounds/` — optional WAV prompts
+
+The application resolves dashboard and sound paths relative to the script location, so it does not depend on the terminal's current working directory.
+
+## Troubleshooting
+
+- **Camera does not open:** close other applications using the webcam and check Windows camera permissions.
+- **A sound is missing:** verify that the expected WAV file exists in `sounds/`; missing sounds are reported as warnings.
+- **Chrome is not installed:** website shortcuts use the system's default browser.
+- **Gesture triggers repeatedly:** adjust the cooldown and smoothing settings in `main.py`.
+
+## Privacy and Safety
+
+Camera frames are processed locally by the application. Recognized gestures can launch websites or Windows tools; review these mappings before use and close the application when webcam tracking is no longer needed.
 
 ## Maintainer
 
