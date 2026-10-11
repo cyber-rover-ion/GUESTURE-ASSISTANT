@@ -7,6 +7,9 @@ import webbrowser
 import collections
 import shutil
 import winsound
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
 from cvzone.HandTrackingModule import HandDetector
 
 # ----------------------------------------------------
@@ -18,12 +21,12 @@ def play_sound(filename):
     If the file does not exist or an error occurs, it prints
     a warning without crashing the application.
     """
-    filepath = os.path.join("sounds", filename)
-    if not os.path.exists(filepath):
+    filepath = BASE_DIR / "sounds" / filename
+    if not filepath.is_file():
         print(f"[Sound Error] File not found: {filepath}")
         return
     try:
-        winsound.PlaySound(filepath, winsound.SND_ASYNC | winsound.SND_FILENAME)
+        winsound.PlaySound(str(filepath), winsound.SND_ASYNC | winsound.SND_FILENAME)
     except Exception as e:
         print(f"[Sound Error] Could not play {filepath}: {e}")
 
@@ -31,8 +34,11 @@ def play_sound(filename):
 # Application & URL Launcher Helpers
 # ----------------------------------------------------
 def open_dashboard():
-    html_path = os.path.abspath("dashboard.html")
-    webbrowser.open("file://" + html_path)
+    dashboard_path = BASE_DIR / "dashboard.html"
+    if dashboard_path.is_file():
+        webbrowser.open(dashboard_path.as_uri())
+    else:
+        print(f"[Warning] Dashboard file not found: {dashboard_path}")
 
 def get_chrome_path():
     possible_paths = [
@@ -55,12 +61,8 @@ def open_url_in_chrome(url):
             webbrowser.open(url)
             return f"Opened default browser: {e}"
     else:
-        try:
-            os.system(f'start chrome "{url}"')
-            return f"Launched Chrome via start command"
-        except Exception:
-            webbrowser.open(url)
-            return "Opened default browser"
+        webbrowser.open(url)
+        return "Opened default browser (Chrome was not found)"
 
 def open_antigravity():
     agy_path = shutil.which('agy')
@@ -70,19 +72,14 @@ def open_antigravity():
             return "Launched Antigravity CLI/App"
         except Exception as e:
             pass
-    try:
-        os.system("start agy")
-        return "Launched Antigravity via system start"
-    except Exception as e:
-        return f"Could not launch Antigravity: {e}"
+    return "Antigravity could not be launched: the agy command was not found."
 
 def open_task_manager():
     try:
         subprocess.Popen(["taskmgr.exe"])
         return "Opened Windows Task Manager"
-    except Exception as e:
-        os.system("start taskmgr")
-        return "Opened Task Manager via start command"
+    except OSError as e:
+        return f"Could not open Task Manager: {e}"
 
 # ----------------------------------------------------
 # Precise 5-Gesture Classifier
@@ -267,7 +264,7 @@ def main():
         # App Title
         cv2.putText(frame, "HAND TRACKING GESTURE APP LAUNCHER", (15, 25),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-        cv2.putText(frame, "Peace YouTube | Pointer ChatGPT | Rock Instagram | Three Antigravity | Pinky Task Manager", (15, 48),
+        cv2.putText(frame, "Peace YouTube | Pointer ChatGPT | Rock Instagram | Three WhatsApp | Pinky Task Manager", (15, 48),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.4, (180, 180, 180), 1)
 
         # Current Gesture Display Panel (Top Left Overlay)
