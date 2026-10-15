@@ -76,3 +76,6 @@ Gesture recognition is designed to process webcam input locally. Websites opened
 ## Maintainer
 
 **JebinTech**
+
+- GitHub: [@cyber-rover-ion](https://github.com/cyber-rover-ion)
+- Instagram: [@constantine.hell](https://www.instagram.com/constantine.hell/)
