@@ -7,6 +7,7 @@ import webbrowser
 import collections
 import shutil
 import winsound
+from urllib.parse import urlparse
 from cvzone.HandTrackingModule import HandDetector
 
 # ----------------------------------------------------
@@ -46,43 +47,38 @@ def get_chrome_path():
     return None
 
 def open_url_in_chrome(url):
+    """Open only valid HTTP(S) URLs without passing user data through a shell."""
+    parsed_url = urlparse(str(url))
+    if parsed_url.scheme not in ("http", "https") or not parsed_url.netloc:
+        return "Blocked invalid URL"
+
     chrome_path = get_chrome_path()
     if chrome_path:
         try:
             subprocess.Popen([chrome_path, url])
             return f"Opened {url} in Chrome"
-        except Exception as e:
-            webbrowser.open(url)
-            return f"Opened default browser: {e}"
-    else:
-        try:
-            os.system(f'start chrome "{url}"')
-            return f"Launched Chrome via start command"
-        except Exception:
-            webbrowser.open(url)
-            return "Opened default browser"
+        except OSError:
+            pass
+
+    webbrowser.open(url)
+    return "Opened default browser"
 
 def open_antigravity():
-    agy_path = shutil.which('agy')
-    if agy_path:
-        try:
-            subprocess.Popen([agy_path])
-            return "Launched Antigravity CLI/App"
-        except Exception as e:
-            pass
+    agy_path = shutil.which("agy")
+    if not agy_path:
+        return "Antigravity CLI ('agy') was not found on PATH"
     try:
-        os.system("start agy")
-        return "Launched Antigravity via system start"
-    except Exception as e:
+        subprocess.Popen([agy_path])
+        return "Launched Antigravity CLI/App"
+    except OSError as e:
         return f"Could not launch Antigravity: {e}"
 
 def open_task_manager():
     try:
         subprocess.Popen(["taskmgr.exe"])
         return "Opened Windows Task Manager"
-    except Exception as e:
-        os.system("start taskmgr")
-        return "Opened Task Manager via start command"
+    except OSError as e:
+        return f"Could not open Windows Task Manager: {e}"
 
 # ----------------------------------------------------
 # Precise 5-Gesture Classifier
