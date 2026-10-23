@@ -9,6 +9,8 @@ import shutil
 import winsound
 from cvzone.HandTrackingModule import HandDetector
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # ----------------------------------------------------
 # Sound Helper
 # ----------------------------------------------------
@@ -18,7 +20,7 @@ def play_sound(filename):
     If the file does not exist or an error occurs, it prints
     a warning without crashing the application.
     """
-    filepath = os.path.join("sounds", filename)
+    filepath = os.path.join(BASE_DIR, "sounds", filename)
     if not os.path.exists(filepath):
         print(f"[Sound Error] File not found: {filepath}")
         return
@@ -31,7 +33,7 @@ def play_sound(filename):
 # Application & URL Launcher Helpers
 # ----------------------------------------------------
 def open_dashboard():
-    html_path = os.path.abspath("dashboard.html")
+    html_path = os.path.join(BASE_DIR, "dashboard.html")
     webbrowser.open("file://" + html_path)
 
 def get_chrome_path():
